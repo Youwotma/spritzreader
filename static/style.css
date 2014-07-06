@@ -1,0 +1,61 @@
+/* line 1, style.scss */
+#spritz_view {
+  background-color: #f4e8aa;
+  font-size: 100px;
+  color: #826e01;
+  padding: 100px;
+  font-family: sans-serif;
+  display: none;
+  position: absolute;
+  top: 100px;
+  width: 100%;
+}
+
+/* line 12, style.scss */
+#word_pre {
+  width: 30%;
+  text-align: right;
+  float: left;
+}
+
+/* line 18, style.scss */
+#word_rest {
+  width: 70%;
+  float: right;
+  text-align: left;
+}
+
+/* line 24, style.scss */
+#word_pivot {
+  color: #824601;
+}
+
+/* line 27, style.scss */
+#next_articles, #prev_articles {
+  display: none;
+}
+
+/* line 28, style.scss */
+#current_article {
+  width: 60%;
+  margin: 0 auto;
+  font-size: 125%;
+}
+
+/* line 34, style.scss */
+img {
+  max-width: 100%;
+}
+
+/* line 38, style.scss */
+#loading {
+  background-color: rgba(255, 227, 83, 0.3);
+  width: 100%;
+  font-size: 40px;
+  height: 300px;
+  line-height: 300px;
+  top: 50%;
+  margin-top: -150px;
+  text-align: center;
+  position: absolute;
+}
