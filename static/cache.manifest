@@ -1,0 +1,22 @@
+CACHE MANIFEST
+# v=1
+NETWORK:
+/feed
+/mark_read
+/star
+/auth
+/settokens
+/feeds
+CACHE:
+/static/style.css
+/static/img.js
+/static/event.js
+/static/feed.js
+/static/spritz.js
+/static/lib/jquery/dist/jquery.min.js
+/static/lib/bootstrap/dist/js/bootstrap.min.js
+/static/lib/bootstrap/dist/css/bootstrap.min.css
+/static/lib/bootstrap/dist/fonts/glyphicons-halflings-regular.woff
+/static/lib/bootstrap/dist/fonts/glyphicons-halflings-regular.svg
+/static/lib/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf
+/static/lib/bootstrap/dist/fonts/glyphicons-halflings-regular.eot
