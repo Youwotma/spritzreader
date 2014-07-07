@@ -1,6 +1,6 @@
 from flask import Flask, redirect, request, session, send_file, jsonify
 from feedly import FeedlyClient
-from config import FEEDLY_CLIENT_ID, FEEDLY_SANDBOX, FEEDLY_REDIRECT_URI, FEEDLY_CLIENT_SECRET, SECRET_KEY
+from config import FEEDLY_CLIENT_ID, FEEDLY_SANDBOX, FEEDLY_REDIRECT_URI, FEEDLY_CLIENT_SECRET
 app = Flask(__name__)
 
 @app.route("/")
@@ -15,6 +15,8 @@ def hello():
 
     if "access" not in session:
         return "You are not logged in. <a href='/auth'>Login with feedly</a>";
+
+    session.permanent = True
 
     return send_file("./static/index.html")
 
@@ -61,7 +63,7 @@ def auth():
     code_url = feedly.get_code_url(FEEDLY_REDIRECT_URI)
     return redirect(code_url)
 
-app.secret_key = SECRET_KEY
+app.secret_key='yZ7BMXMOXj7YA3cR2yS0WrNPll8tilaEBiiRjreRKJB389orNqqwGE='
 
 if __name__ == "__main__":
     app.run(debug=FEEDLY_SANDBOX, port=8080)
