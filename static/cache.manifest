@@ -1,12 +1,7 @@
 CACHE MANIFEST
-# v=1
+# v=2
 NETWORK:
-/feed
-/mark_read
-/star
-/auth
-/settokens
-/feeds
+*
 CACHE:
 /static/style.css
 /static/img.js

@@ -9,6 +9,7 @@ def hello():
     if "code" in request.args:
         feedly = get_feedly_client()
         res_access_token = feedly.get_access_token(FEEDLY_REDIRECT_URI, request.args['code'])
+        session.permanent = True
         session['id'] = res_access_token['id']
         session['access'] =_token=res_access_token['access_token']
         return redirect("/")
@@ -16,7 +17,6 @@ def hello():
     if "access" not in session:
         return "You are not logged in. <a href='/auth'>Login with feedly</a>";
 
-    session.permanent = True
 
     return send_file("./static/index.html")
 
