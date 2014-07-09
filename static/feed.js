@@ -62,7 +62,7 @@ function nextArticle(){
             markRead(next.data('id'));
             next.data('unread', false);
         }
-        preloadArticle();
+        setTimeout(preloadArticle, 2000);
     }else {
         spritzText("No more items");
     }
@@ -81,11 +81,12 @@ function preloadArticle(){
     var article = not_loaded_articles.shift();
     if(!article) return;
     $("<div/>").append(
-        $("<h1 class='maintitle'/>").append($("<a/>").attr('href', article.alternate[0].href).text(article.title))
+        $("<h1 class='maintitle'/>").append($("<a/>").attr('target', '_blank').attr('href', article.alternate[0].href).text(article.title))
     ).append(
         $("<div class='text-muted small'/>").text(article.origin.title + ' By ' + article.author)
     ).append(
         $("<div class='article_body'/>").html(article.content?article.content.content:article.summary.content)
+            .find("a").attr("target", "_blank").end()
     ).data('unread', article.unread).data('id', article.id).appendTo($next_article);
 }
 
@@ -104,7 +105,7 @@ $(document).keypress(function(e){
         case 'k': return prevArticle();
         case 'q': return spritzCancel();
         case 's': return saveForLater();
-        case 'd': return spritzTitle();
+        case 'w': return spritzTitle();
         default: console.log(e.which);
     }
 });
