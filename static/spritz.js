@@ -120,8 +120,6 @@ function spritzDuration(word){
     var d = 60*1000/wpm;
     d *= Math.max(1, 1.5 - spritz_wordcount/4); // First words slower
     d *= 1 + (word.length-4)*(0.2/7); // Longer words slower, sorter faster
-
-
     return d;
 }
 
