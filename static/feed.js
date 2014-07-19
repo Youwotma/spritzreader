@@ -1,6 +1,7 @@
 var $current_article = $("#current_article");
 var $next_article = $("#next_articles");
 var $prev_article = $("#prev_articles");
+var $count = $("#count");
 
 var not_loaded_articles = [];
 var MAX_RETRIES = 5;
@@ -63,6 +64,7 @@ function nextArticle(){
             next.data('unread', false);
         }
         setTimeout(preloadArticle, 2000);
+        updateCount();
     }else {
         spritzText("No more items");
     }
@@ -90,14 +92,30 @@ function preloadArticle(){
     ).data('unread', article.unread).data('id', article.id).appendTo($next_article);
 }
 
-$e.once('items-received', function(){
-    $("#loading").hide();
-    preloadArticle();
-    nextArticle();
-    for (var i = 1; i < 6; i++) {
-        setTimeout(preloadArticle, i*i*70);
-    }
-});
+function updateCount(){
+    $count.text(not_loaded_articles.length + $next_article.children().length);
+}
+$e.subscribe('items-received', updateCount);
+
+function refreshFeed(){
+    $next_article.empty();
+    $current_article.empty();
+    $prev_article.empty();
+    not_loaded_articles = [];
+    spritzCancel();
+    $("#loading").show();
+
+    $e.once('items-received', function(){
+        $("#loading").hide();
+        preloadArticle();
+        nextArticle();
+        for (var i = 1; i < 6; i++) {
+            setTimeout(preloadArticle, i*i*70);
+        }
+    });
+
+    updateFeed();
+}
 
 $(document).keypress(function(e){
     switch(String.fromCharCode(e.which)){
@@ -106,9 +124,10 @@ $(document).keypress(function(e){
         case 'q': return spritzCancel();
         case 's': return saveForLater();
         case 'w': return spritzTitle();
+        case 'r': return refreshFeed();
         default: console.log(e.which);
     }
 });
 
-updateFeed();
+refreshFeed();
 
