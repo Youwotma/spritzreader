@@ -1,8 +1,8 @@
 CACHE MANIFEST
-# v=3
+# v=4
 NETWORK:
 *
-CACHE:
+#CACHE:
 /static/style.css
 /static/img.js
 /static/event.js

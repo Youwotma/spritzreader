@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html manifest="/static/cache.manifest">
+<html>
     <head>
         <meta charset="utf-8">
         <title>RSS</title>
@@ -7,7 +7,12 @@
         <link rel="stylesheet" href="/static/style.css" type="text/css" charset="utf-8">
     </head>
     <body>
-        <div id="count">0</div>
+        <div id="chrome">
+            <span id="count">0</span>
+            <span id="starred">♥</span>
+            <a id="starred_link" href="?starred">Starred</a>
+            <a id="all_link" href="?">All</a>
+        </div>
 
         <div id="spritz_view">
             <div id="word_pre">H</div>

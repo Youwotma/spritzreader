@@ -3,6 +3,9 @@ var $next_article = $("#next_articles");
 var $prev_article = $("#prev_articles");
 var $count = $("#count");
 
+var isStarred = location.search.indexOf("starred") >= 0;
+$(isStarred ? "#starred_link" : "#all_link").hide();
+
 var not_loaded_articles = [];
 var MAX_RETRIES = 5;
 
@@ -15,7 +18,9 @@ function updateFeed(continuation, count, retries) {
         args.continuation = continuation;
     }
 
-    $.getJSON("/feed?" + $.param(args))
+    var feed = isStarred ? "starred" : "feed";
+
+    $.getJSON('/' + feed + '?' + $.param(args))
     .done(function(data){
         var res = data.res;
         not_loaded_articles = not_loaded_articles.concat(res.items);
@@ -47,8 +52,15 @@ function markRead(id) {
     $.post("/mark_read?item=" + encodeURIComponent(id), function(){});
 }
 
-function saveForLater(id) {
-    $.post("/star?item=" + encodeURIComponent(currentItemId()), function(){});
+function saveForLaterToggle(id) {
+    var $curr = $current_article.children();
+    if($curr.data("starred")){
+        $.post("/unstar?item=" + encodeURIComponent(currentItemId()), function(){});
+    }else {
+        $.post("/star?item=" + encodeURIComponent(currentItemId()), function(){});
+    }
+    $curr.data("starred", !$curr.data("starred"));
+    $('#starred')[$curr.data('starred') ? 'show' : 'hide']();
 }
 
 
@@ -63,6 +75,7 @@ function nextArticle(){
             markRead(next.data('id'));
             next.data('unread', false);
         }
+        $('#starred')[next.data('starred') ? 'show' : 'hide']();
         setTimeout(preloadArticle, 2000);
         updateCount();
     }else {
@@ -89,7 +102,11 @@ function preloadArticle(){
     ).append(
         $("<div class='article_body'/>").html(article.content?article.content.content:article.summary.content)
             .find("a").attr("target", "_blank").end()
-    ).data('unread', article.unread).data('id', article.id).appendTo($next_article);
+    ).data('unread', article.unread)
+     .data('id', article.id)
+     .data('starred', article.tags && article.tags.some(function(tag){ return tag.id.indexOf('global.saved') > 0;}))
+     .appendTo($next_article);
+
 }
 
 function updateCount(){
@@ -122,7 +139,7 @@ $(document).keypress(function(e){
         case 'j': return nextArticle();
         case 'k': return prevArticle();
         case 'q': return spritzCancel();
-        case 's': return saveForLater();
+        case 's': return saveForLaterToggle();
         case 'w': return spritzTitle();
         case 'r': return refreshFeed();
         default: console.log(e.which);

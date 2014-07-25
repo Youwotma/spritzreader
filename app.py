@@ -40,6 +40,11 @@ def feed():
     fl = get_feedly_client()
     return jsonify(res=fl.get_feed_content(fl.token, "user/" + session['id'] + "/category/global.all", request.args.to_dict()))
 
+@app.route("/starred")
+def starred():
+    fl = get_feedly_client()
+    return jsonify(res=fl.get_feed_content(fl.token, "user/" + session['id'] + "/tag/global.saved", request.args.to_dict()))
+
 @app.route("/settokens", methods=['POST'])
 def settoken():
     session['id'] = request.form['id']
@@ -55,6 +60,11 @@ def mark_read():
 def star():
     fl = get_feedly_client()
     return jsonify(res=fl.save_for_later(fl.token, session['id'], [request.args['item']]).status_code)
+
+@app.route("/unstar", methods=["POST"])
+def unstar():
+    fl = get_feedly_client()
+    return jsonify(res=fl.save_for_later(fl.token, session['id'], [request.args['item']], False).status_code)
 
 @app.route("/auth")
 def auth():
