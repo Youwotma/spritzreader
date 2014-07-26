@@ -1,6 +1,7 @@
 from flask import Flask, redirect, request, session, send_file, jsonify
 from feedly import FeedlyClient
 from config import FEEDLY_CLIENT_ID, FEEDLY_SANDBOX, FEEDLY_REDIRECT_URI, FEEDLY_CLIENT_SECRET
+import time
 app = Flask(__name__)
 
 @app.route("/")
@@ -11,24 +12,38 @@ def hello():
         res_access_token = feedly.get_access_token(FEEDLY_REDIRECT_URI, request.args['code'])
         session.permanent = True
         session['id'] = res_access_token['id']
-        session['access'] =_token=res_access_token['access_token']
+        session['access'] = res_access_token['access_token']
+        session['refresh'] = res_access_token['refresh_token']
+        session['expires'] = time.time() + res_access_token['expires_in'] - 600
         return redirect("/")
 
     if "access" not in session:
         return "You are not logged in. <a href='/auth'>Login with feedly</a>";
 
-
     return send_file("./static/index.html")
 
 def get_feedly_client():
     if "access" in session:
+        if session.get('expires', 0) < time.time():
+            # Expired token...
+            del session['access']
+            return get_feedly_client()
         return FeedlyClient(token=session['access'], sandbox=FEEDLY_SANDBOX)
     else:
-        return FeedlyClient(
+        client = FeedlyClient(
             client_id=FEEDLY_CLIENT_ID,
             client_secret=FEEDLY_CLIENT_SECRET,
             sandbox=FEEDLY_SANDBOX
         )
+        if 'refresh' in session:
+            print("Refresh access token")
+            res_refresh = client.refresh_access_token(session['refresh'])
+            session['access'] = res_refresh['access_token']
+            session['expires'] = time.time() + res_refresh['expires_in'] - 600
+            return get_feedly_client()
+        else:
+            return client
+
 
 @app.route("/feeds")
 def feeds():
@@ -73,8 +88,15 @@ def auth():
     code_url = feedly.get_code_url(FEEDLY_REDIRECT_URI)
     return redirect(code_url)
 
+@app.route("/logout")
+def logout():
+    for k in 'access', 'refresh', 'expires', 'id':
+        if k in session:
+            del session[k]
+    return redirect("/")
+
 app.secret_key='yZ7BMXMOXj7YA3cR2yS0WrNPll8tilaEBiiRjreRKJB389orNqqwGE='
 
 if __name__ == "__main__":
-    app.run(debug=FEEDLY_SANDBOX, port=8080)
+    app.run(debug=True, port=8080)
 
