@@ -59,12 +59,12 @@ def mark_read():
 @app.route("/star", methods=["POST"])
 def star():
     fl = get_feedly_client()
-    return jsonify(res=fl.save_for_later(fl.token, session['id'], [request.args['item']]).status_code)
+    return jsonify(res=fl.save_for_later(fl.token, session['id'], request.args['item']).status_code)
 
 @app.route("/unstar", methods=["POST"])
 def unstar():
     fl = get_feedly_client()
-    return jsonify(res=fl.save_for_later(fl.token, session['id'], [request.args['item']], False).status_code)
+    return jsonify(res=fl.save_for_later(fl.token, session['id'], request.args['item'], False).status_code)
 
 @app.route("/auth")
 def auth():

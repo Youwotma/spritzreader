@@ -85,7 +85,7 @@ class FeedlyClient(object):
         res = requests.post(url=quest_url, data=json.dumps(params), headers=headers)
         return res
 
-    def save_for_later(self, access_token, user_id, entryIds, save=True):
+    def save_for_later(self, access_token, user_id, entryId, save=True):
         '''saved for later.entryIds is a list for entry id.'''
         headers = {
             'content-type': 'application/json',
@@ -93,11 +93,12 @@ class FeedlyClient(object):
         }
         request_url = self._get_endpoint('v3/tags') + '/user%2F' + user_id + '%2Ftag%2Fglobal.saved'
 
-        params = dict(entryIds=entryIds)
         if save:
+            params = dict(entryIds=[entryId])
             res = requests.put(url=request_url, data=json.dumps(params), headers=headers)
         else:
-            res = requests.delete(url=request_url, data=json.dumps(params), headers=headers)
+            request_url += '/' + entryId
+            res = requests.delete(url=request_url, headers=headers)
         return res
 
     def _get_endpoint(self, path=None):
