@@ -28,7 +28,13 @@ def get_feedly_client():
             # Expired token...
             del session['access']
             return get_feedly_client()
-        return FeedlyClient(token=session['access'], sandbox=FEEDLY_SANDBOX)
+        else:
+            return FeedlyClient(
+                token=session['access'],
+                client_id=FEEDLY_CLIENT_ID,
+                client_secret=FEEDLY_CLIENT_SECRET,
+                sandbox=FEEDLY_SANDBOX
+            )
     else:
         client = FeedlyClient(
             client_id=FEEDLY_CLIENT_ID,
@@ -98,5 +104,5 @@ def logout():
 app.secret_key='yZ7BMXMOXj7YA3cR2yS0WrNPll8tilaEBiiRjreRKJB389orNqqwGE='
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8080)
+    app.run(debug=True, port=8080, host='0.0.0.0')
 

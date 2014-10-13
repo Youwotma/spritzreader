@@ -76,7 +76,7 @@ function nextArticle(){
             next.data('unread', false);
         }
         $('#starred')[next.data('starred') ? 'show' : 'hide']();
-        setTimeout(preloadArticle, 2000);
+        setTimeout(preloadArticle, 3000);
         updateCount();
     }else {
         spritzText("No more items");
@@ -92,6 +92,16 @@ function prevArticle(){
     }
 }
 
+function clickToLoadIframe(i, elm){
+    var $this = $(this);
+    $this.attr('data-src', $this.attr('src')).removeAttr('src').after(
+        $('<button/>').click(function(){
+            $this.attr('src', $this.attr('data-src'));
+            $(this).remove();
+        }).text('Load iframe')
+    );
+}
+
 function preloadArticle(){
     var article = not_loaded_articles.shift();
     if(!article) return;
@@ -100,7 +110,8 @@ function preloadArticle(){
     ).append(
         $("<div class='text-muted small'/>").text(article.origin.title + ' By ' + article.author)
     ).append(
-        $("<div class='article_body'/>").html(article.content?article.content.content:article.summary.content)
+        $("<div class='article_body'/>").html(article.content?article.content.content : (article.summary? article.summary.content : 'No content'))
+            .find("iframe").each(clickToLoadIframe).end()
             .find("a").attr("target", "_blank").end()
     ).data('unread', article.unread)
      .data('id', article.id)
@@ -145,6 +156,14 @@ $(document).keypress(function(e){
         default: console.log(e.which);
     }
 });
+
+var hammer = new Hammer(document.body)
+    .on('swipeleft', prevArticle)
+    .on('swiperight', nextArticle);
+
+var hammer2 = new Hammer($("#current_article")[0])
+    .on('swipeleft', prevArticle)
+    .on('swiperight', nextArticle);
 
 refreshFeed();
 

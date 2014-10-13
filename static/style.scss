@@ -1,14 +1,18 @@
 #spritz_view {
-    background-color: #f4e8aa;
-    font-size: 100px;
-    color: #826e01;
-    padding: 100px;
+    background-color: #eee;
+    font-size: 50px;
+    color: #222222;
+    padding: 20px;
     font-family: sans-serif;
     display: none;
     position: fixed;
-    top: 100px;
+    top: 200px;
     width: 100%;
+    border: solid #444;
+    border-width: 10px 0px;
+    z-index: 100;
 }
+
 #word_pre {
     width: 30%;
     text-align: right;
@@ -22,7 +26,7 @@
 }
 
 #word_pivot {
-    color: #824601;
+    color: #ee0000;
 }
 #next_articles, #prev_articles { display: none; }
 #current_article {
@@ -52,3 +56,15 @@ img {
     position: absolute;
 }
 
+
+@media (max-width: 1000px) {
+    #spritz_view {
+        padding: 0px;
+        font-size: 60px;
+    }
+    #current_article {
+        width: 92%;
+        margin: 4%;
+        font-size: 125%;
+    }
+}

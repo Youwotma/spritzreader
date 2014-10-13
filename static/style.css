@@ -1,53 +1,56 @@
 /* line 1, style.scss */
 #spritz_view {
-  background-color: #f4e8aa;
-  font-size: 100px;
-  color: #826e01;
-  padding: 100px;
+  background-color: #eee;
+  font-size: 50px;
+  color: #222222;
+  padding: 20px;
   font-family: sans-serif;
   display: none;
   position: fixed;
-  top: 100px;
+  top: 200px;
   width: 100%;
+  border: solid #444;
+  border-width: 10px 0px;
+  z-index: 100;
 }
 
-/* line 12, style.scss */
+/* line 16, style.scss */
 #word_pre {
   width: 30%;
   text-align: right;
   float: left;
 }
 
-/* line 18, style.scss */
+/* line 22, style.scss */
 #word_rest {
   width: 70%;
   float: right;
   text-align: left;
 }
 
-/* line 24, style.scss */
+/* line 28, style.scss */
 #word_pivot {
-  color: #824601;
+  color: #ee0000;
 }
 
-/* line 27, style.scss */
+/* line 31, style.scss */
 #next_articles, #prev_articles {
   display: none;
 }
 
-/* line 28, style.scss */
+/* line 32, style.scss */
 #current_article {
   width: 60%;
   margin: 0 auto;
   font-size: 125%;
 }
 
-/* line 34, style.scss */
+/* line 38, style.scss */
 img {
   max-width: 100%;
 }
 
-/* line 38, style.scss */
+/* line 42, style.scss */
 #loading {
   background-color: rgba(255, 227, 83, 0.3);
   width: 100%;
@@ -60,7 +63,22 @@ img {
   position: absolute;
 }
 
-/* line 51, style.scss */
+/* line 55, style.scss */
 #chrome {
   position: absolute;
+}
+
+@media (max-width: 1000px) {
+  /* line 61, style.scss */
+  #spritz_view {
+    padding: 0px;
+    font-size: 60px;
+  }
+
+  /* line 65, style.scss */
+  #current_article {
+    width: 92%;
+    margin: 4%;
+    font-size: 125%;
+  }
 }
