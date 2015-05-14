@@ -88,6 +88,8 @@ function prevArticle(){
     if(prev.length){
         $current_article.children().prependTo($next_article);
         prev.appendTo($current_article);
+        $('#starred')[prev.data('starred') ? 'show' : 'hide']();
+        window.scrollTo(0,0);
         spritzTitle();
     }
 }
@@ -102,6 +104,24 @@ function clickToLoadIframe(i, elm){
     );
 }
 
+function getContentForArticle(article){
+    var content = ((article.content && article.content.content) ||
+        (article.summary && article.summary.content));
+
+    if(article.enclosure){
+        article.enclosure.forEach(function(media){
+            content += "<p>";
+            if(media.type == "image"){
+                content += "<img src='" + media.href + "'></img>";
+            } else {
+                content += "Media enclosure: <pre>" + JSON.stringify(media) + "</pre>";
+            }
+            content += "</p>";
+        });
+    }
+    return content || "No content";
+}
+
 function preloadArticle(){
     var article = not_loaded_articles.shift();
     if(!article) return;
@@ -110,7 +130,7 @@ function preloadArticle(){
     ).append(
         $("<div class='text-muted small'/>").text(article.origin.title + ' By ' + article.author)
     ).append(
-        $("<div class='article_body'/>").html(article.content?article.content.content : (article.summary? article.summary.content : 'No content'))
+        $("<div class='article_body'/>").html(getContentForArticle(article))
             .find("iframe").each(clickToLoadIframe).end()
             .find("a").attr("target", "_blank").end()
     ).data('unread', article.unread)
