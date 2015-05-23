@@ -63,21 +63,30 @@ function saveForLaterToggle(id) {
     $('#starred')[$curr.data('starred') ? 'show' : 'hide']();
 }
 
+function updateArticle(){
+    var $current = $current_article.children();
+    var $title = $current.find('h1.maintitle a');
+    $('#starred')[$current.data('starred') ? 'show' : 'hide']();
+    updateCount();
+    window.scrollTo(0,0);
+    spritzTitle();
+    $('#share_link').attr('href', 'https://buffer.com/add/?' + $.param({
+        url: $title.attr('href'),
+        text: $title.text()
+    }));
+}
 
 function nextArticle(){
     var next = $next_article.children().first();
     if(next.length){
         $current_article.children().appendTo($prev_article);
         next.appendTo($current_article);
-        window.scrollTo(0,0);
-        spritzTitle();
         if(next.data('unread')){
             markRead(next.data('id'));
             next.data('unread', false);
         }
-        $('#starred')[next.data('starred') ? 'show' : 'hide']();
         setTimeout(preloadArticle, 3000);
-        updateCount();
+        updateArticle();
     }else {
         spritzText("No more items");
     }
@@ -88,9 +97,7 @@ function prevArticle(){
     if(prev.length){
         $current_article.children().prependTo($next_article);
         prev.appendTo($current_article);
-        $('#starred')[prev.data('starred') ? 'show' : 'hide']();
-        window.scrollTo(0,0);
-        spritzTitle();
+        updateArticle();
     }
 }
 
