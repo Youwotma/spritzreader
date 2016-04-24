@@ -116,6 +116,10 @@ function spritzWord(word) {
     word_post.nodeValue = word.slice(pv + 1);
 }
 
+function spritzSelection(){
+    spritzText(document.getSelection().getRangeAt(0).toString());
+}
+
 function spritzDuration(word){
     var d = 60*1000/wpm;
     d *= Math.max(1, 1.5 - spritz_wordcount/4); // First words slower

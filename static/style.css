@@ -65,7 +65,7 @@ img {
 
 /* line 55, style.scss */
 #chrome {
-  position: absolute;
+  position: fixed;
 }
 
 @media (max-width: 1000px) {

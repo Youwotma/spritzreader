@@ -179,6 +179,7 @@ $(document).keypress(function(e){
         case 'q': return spritzCancel();
         case 's': return saveForLaterToggle();
         case 'w': return spritzTitle();
+        case 'l': return spritzSelection();
         case 'r': return refreshFeed();
         default: console.log(e.which);
     }
