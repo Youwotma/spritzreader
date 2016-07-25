@@ -122,7 +122,7 @@ function removeTodo(idOrType, article) {
                 .filter('type', idOrType)
                 .execute()
                 .then(function(results){
-                    return $.when(results.map(function(result) {
+                    return $.when.apply($, results.map(function(result) {
                         return removeTodo(result.id);
                     }));
                 });
@@ -141,6 +141,7 @@ function getBlobFromUrl(url) {
                 return saveBlob(blob, url);
             });
         }
+        return obj;
     }).then(function(obj){
         return obj && obj.blob;
     });

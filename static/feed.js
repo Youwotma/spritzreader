@@ -202,6 +202,7 @@ function getContentForArticle(article){
     }
     content = content || "No content";
     content = content.replace(/(<img[^<>]*)\s+src\s*=/gi, '$1 data-orig-src=');
+    content = content.replace(/(<img[^<>]*)\s+srcset\s*=/gi, '$1 data-orig-srcset=');
     return '<div class="article_body">' + content + '</div>';
 
 }
@@ -237,17 +238,29 @@ function getContentWithImages(article){
     var blobsByUrl = {};
     $content.find('img[data-orig-src]').each(function(_, img){
         var url = img.getAttribute('data-orig-src');
-        var p = getBlobFromUrl(url).then(function(blob) {
+        var d = $.Deferred();
+        getBlobFromUrl(url).then(function(blob) {
             blobsByUrl[url] = blob;
+            d.resolve();
+        }, function(e){
+            console.log('fetch failed', url, e);
+            d.resolve();
         });
-        promises.push(p);
+        setTimeout(function(){
+            d.resolve();
+        }, 5000);
+        promises.push(d);
     });
 
-    return $.when(promises).then(function(){
+    return $.when.apply($, promises).then(function(){
+        promises = null;
+
         $content.find('img[data-orig-src]').each(function(i, img){
             var url = img.getAttribute('data-orig-src');
             if(url in blobsByUrl) {
                 img.setAttribute('src', URL.createObjectURL(blobsByUrl[url]));
+            } else {
+                console.log('urlMiss', url, blobsByUrl, blobsByUrl[url]);
             }
         });
 
@@ -259,12 +272,13 @@ function preloadArticle(){
     var article = not_loaded_articles.shift();
     if(!article){
         console.log('No article to preload');
-        var d = $.Deferred(); d.resolve();
-        return d.promise();
+        return $.when();
     }
 
     return getContentWithImages(article).then(function($article){
         $article.appendTo($next_article);
+    }, function(e){
+        alert('failed to preload article ' + e);
     });
 }
 
