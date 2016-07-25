@@ -269,8 +269,9 @@ function preloadArticle(){
 }
 
 function formatArticle(article, $content){
+    var href = article.alternate && article.alternate[0].href;
     return $("<div/>").append(
-        $("<h1 class='maintitle'/>").append($("<a/>").attr('target', '_blank').attr('href', article.alternate[0].href).text(article.title))
+        $("<h1 class='maintitle'/>").append($("<a/>").attr('target', '_blank').attr('href', href).text(article.title))
     ).append(
         $("<div class='text-muted small'/>").text(article.origin.title + ' By ' + article.author)
     ).append(
