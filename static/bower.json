@@ -17,6 +17,8 @@
   "dependencies": {
     "jquery": "~2.1.1",
     "bootstrap": "~3.2.0",
-    "hammerjs": "~2.0.3"
+    "hammerjs": "~2.0.3",
+    "db.js": "~0.15.0",
+    "js-sha1": "~0.3.0"
   }
 }

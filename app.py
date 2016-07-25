@@ -1,8 +1,13 @@
-from flask import Flask, redirect, request, session, send_file, jsonify
+from flask import Flask, redirect, request, session, send_file, jsonify, Response
 from feedly import FeedlyClient
 from config import FEEDLY_CLIENT_ID, FEEDLY_SANDBOX, FEEDLY_REDIRECT_URI, FEEDLY_CLIENT_SECRET
 import time
+import hashlib
+import requests
+import binascii
 app = Flask(__name__)
+
+s = requests.Session()
 
 
 @app.route("/")
@@ -19,8 +24,12 @@ def hello():
 
     if "access" not in session:
         return "You are not logged in. <a href='/auth'>Login with feedly</a>"
-
     return send_file("./static/index.html")
+
+
+@app.route('/idbtest')
+def itest():
+    return send_file("./static/idbtest.html")
 
 
 def get_feedly_client():
@@ -58,11 +67,20 @@ def feeds():
     return jsonify(res=fl.get_user_subscriptions(fl.token))
 
 
+def hasharticle(article):
+    hex = hashlib.sha1(article['id']).hexdigest()[:12]
+    return binascii.b2a_base64(binascii.unhexlify(hex)).strip()
+
+
 @app.route("/feed")
 def feed():
     fl = get_feedly_client()
     url = "user/" + session['id'] + "/category/global.all"
-    return jsonify(res=fl.get_feed_content(fl.token, url, request.args.to_dict()))
+    args = request.args.to_dict()
+    have = args.pop('have', '').split(',')
+    res = fl.get_feed_content(fl.token, url, args)
+    res['items'] = [r for r in res['items'] if hasharticle(r) not in have]
+    return jsonify(res=res)
 
 
 @app.route("/starred")
@@ -107,7 +125,18 @@ def auth():
 
 @app.route("/proxy")
 def proxy():
-    return ""
+    url = request.args['url']
+    res = s.get(url, stream=False)
+
+    def gen():
+        return res.raw.read()
+        #chunk = res.raw.read(1024*16)
+        #while chunk:
+        #    yield chunk
+        #    chunk = res.raw.read(1024*16)
+
+    mime = res.headers.get('content-type', 'application/octet-stream')
+    return Response(res.content, mimetype=mime)
 
 
 @app.route("/logout")
