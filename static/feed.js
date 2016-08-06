@@ -7,7 +7,7 @@ var isStarred = location.search.indexOf("starred") >= 0;
 $(isStarred ? "#starred_link" : "#all_link").hide();
 
 var not_loaded_articles = [];
-var got_from_cache_ids = [];
+var articles_from_cache = {};
 var MAX_RETRIES = 5;
 
 function hashArticle(article){
@@ -21,7 +21,7 @@ function hashArticle(article){
 function updateFeed(continuation, count, retries) {
     retries = retries || 0;
     count = count || 6;
-    var args = {unreadOnly: true, count: count, have: got_from_cache_ids.join(',')};
+    var args = {unreadOnly: true, count: count, have: Object.keys(articles_from_cache).join(',')};
 
     if (continuation) {
         args.continuation = continuation;
@@ -33,10 +33,17 @@ function updateFeed(continuation, count, retries) {
     .done(function(data){
         var res = data.res;
         not_loaded_articles = not_loaded_articles.concat(res.items);
+        for(var id of res.not_included) {
+            articles_from_cache[id].still_fresh = true;
+        }
         $e.publish('items-received', res.items);
         $e.publish('items-received-net', res.items);
         if(res.continuation){
             updateFeed(res.continuation, count*2, 0);
+        } else {
+            not_loaded_articles = not_loaded_articles.filter(function(article){
+                return article.still_fresh || !(hashArticle(article) in articles_from_cache);
+            });
         }
     })
     .fail(function(err){
@@ -59,7 +66,9 @@ function doSyncAll(){
             if(articles.length) {
                 console.log('Loaded ' + articles.length + ' articles from offline cache');
                 not_loaded_articles = not_loaded_articles.concat(articles);
-                got_from_cache_ids = articles.map(hashArticle);
+                for (var article of articles) {
+                    articles_from_cache[hashArticle(article)] = article;
+                }
                 $e.publish('items-received', articles);
             }
             updateFeed();

@@ -79,6 +79,7 @@ def feed():
     args = request.args.to_dict()
     have = args.pop('have', '').split(',')
     res = fl.get_feed_content(fl.token, url, args)
+    res['not_included'] = [hasharticle(r) for r in res['items'] if hasharticle(r) in have]
     res['items'] = [r for r in res['items'] if hasharticle(r) not in have]
     return jsonify(res=res)
 
