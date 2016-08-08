@@ -132,7 +132,7 @@ function saveForLaterToggle(id) {
 
 function runTodo(todo) {
     if(isOnline()) {
-        $.post("/" + todo.type + "?item=" + encodeURIComponent(todo.article), function(){
+        return $.post("/" + todo.type + "?item=" + encodeURIComponent(todo.article), function(){
             removeTodo(todo.id);
         });
     }
