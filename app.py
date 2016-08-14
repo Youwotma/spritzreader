@@ -90,7 +90,7 @@ def feed():
 
 @app.route("/starred")
 def starred():
-    get_feed("/tag/global.saved")
+    return get_feed("/tag/global.saved")
 
 
 @app.route("/settokens", methods=['POST'])
