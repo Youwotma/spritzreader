@@ -72,10 +72,9 @@ def hasharticle(article):
     return binascii.b2a_base64(binascii.unhexlify(hex)).strip()
 
 
-@app.route("/feed")
-def feed():
+def get_feed(feed):
     fl = get_feedly_client()
-    url = "user/" + session['id'] + "/category/global.all"
+    url = "user/" + session['id'] + feed
     args = request.args.to_dict()
     have = args.pop('have', '').split(',')
     res = fl.get_feed_content(fl.token, url, args)
@@ -84,11 +83,14 @@ def feed():
     return jsonify(res=res)
 
 
+@app.route("/feed")
+def feed():
+    return get_feed("/category/global.all")
+
+
 @app.route("/starred")
 def starred():
-    fl = get_feedly_client()
-    url = "user/" + session['id'] + "/tag/global.saved"
-    return jsonify(res=fl.get_feed_content(fl.token, url, request.args.to_dict()))
+    get_feed("/tag/global.saved")
 
 
 @app.route("/settokens", methods=['POST'])
