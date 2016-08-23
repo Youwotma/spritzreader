@@ -42,7 +42,11 @@ function updateFeed(continuation, count, retries) {
             updateFeed(res.continuation, count*2, 0);
         } else {
             not_loaded_articles = not_loaded_articles.filter(function(article){
-                return article.still_fresh || !(hashArticle(article) in articles_from_cache);
+                var keep = article.still_fresh || !(hashArticle(article) in articles_from_cache);
+                if(!keep) {
+                    removeOfflineArticle(article.id);
+                }
+                return keep;
             });
         }
     })
