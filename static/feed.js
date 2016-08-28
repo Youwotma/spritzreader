@@ -158,9 +158,13 @@ function updateArticle(){
 }
 
 function nextArticle() {
+    var $current = $current_article.children()
     var next = $next_article.children().first();
+    if(isStarred && !$current.data('starred')) {
+        removeOfflineArticle($current.data('id'));
+    }
     if(next.length){
-        $current_article.children().appendTo($prev_article);
+        $current.appendTo($prev_article);
         next.appendTo($current_article);
         if(next.data('unread')){
             markRead(next.data('id'));
