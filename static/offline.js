@@ -100,7 +100,7 @@ function getOfflineArticles(starred){
     return server.then(function(server) {
         return server.articles.query().all().map(function(a) {
             return a.article;
-        }).execute().done(function(list){
+        }).execute().then(function(list){
             return list.filter(function(article){
                 var isStarred = article.tags && article.tags.some(tag => tag.id.indexOf('global.saved') > 0);
                 return isStarred == starred;
