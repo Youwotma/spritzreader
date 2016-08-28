@@ -66,7 +66,7 @@ function doSyncAll(){
 
     function loadCachedArticles(){
         console.log('Loading cached articles...');
-        getOfflineArticles().then(function(articles){
+        getOfflineArticles(isStarred).then(function(articles){
             if(articles.length) {
                 console.log('Loaded ' + articles.length + ' articles from offline cache');
                 not_loaded_articles = not_loaded_articles.concat(articles);
@@ -115,7 +115,9 @@ function currentItemId() {
 
 function markRead(id) {
     addTodo('mark_read', id).then(runTodo);
-    removeOfflineArticle(id);
+    if(isStarred) {
+        removeOfflineArticle(id);
+    }
 }
 
 function hashId(){

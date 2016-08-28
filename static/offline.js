@@ -96,11 +96,16 @@ function removeOfflineArticle(article) {
     });
 }
 
-function getOfflineArticles(){
+function getOfflineArticles(starred){
     return server.then(function(server) {
         return server.articles.query().all().map(function(a) {
             return a.article;
-        }).execute();
+        }).execute().done(function(list){
+            return list.filter(function(article){
+                var isStarred = article.tags && article.tags.some(tag => tag.id.indexOf('global.saved') > 0);
+                return isStarred == starred;
+            });
+        });
     });
 }
 
@@ -111,7 +116,6 @@ function getTodos(){
 }
 
 function prune(){
-    
 }
 
 function removeTodo(idOrType, article) {
