@@ -61,7 +61,7 @@ def reddit_feed(reddit, threshold):
             continue
 
         if post['is_self']:
-            content = process_html(html.unescape(post['selftext_html']), post['url'])
+            content = process_html(html.unescape(post['selftext_html'] or '[no content]'), post['url'])
         else:
             content = extract_main_content(post['url'])
 
