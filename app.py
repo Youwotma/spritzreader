@@ -1,13 +1,16 @@
 from flask import Flask, redirect, request, session, send_file, jsonify, Response
 from feedly import FeedlyClient
-from config import FEEDLY_CLIENT_ID, FEEDLY_SANDBOX, FEEDLY_REDIRECT_URI, FEEDLY_CLIENT_SECRET
+from config import FEEDLY_CLIENT_ID, FEEDLY_SANDBOX, FEEDLY_REDIRECT_URI, FEEDLY_CLIENT_SECRET, SECRET_KEY
+from proxy import proxy
+import reddit
+import hackernews
+import product_hunt
+
 import time
 import hashlib
-import requests
 import binascii
-app = Flask(__name__)
 
-s = requests.Session()
+app = Flask(__name__)
 
 
 @app.route("/")
@@ -127,19 +130,27 @@ def auth():
 
 
 @app.route("/proxy")
-def proxy():
-    url = request.args['url']
-    res = s.get(url, stream=False)
+def _proxy():
+    [content, mime] = proxy(request.args['url'])
+    return Response(content, mimetype=mime)
 
-    def gen():
-        return res.raw.read()
-        #chunk = res.raw.read(1024*16)
-        #while chunk:
-        #    yield chunk
-        #    chunk = res.raw.read(1024*16)
 
-    mime = res.headers.get('content-type', 'application/octet-stream')
-    return Response(res.content, mimetype=mime)
+@app.route("/r/<subreddit>.xml")
+def reddit_feed(subreddit):
+    content = reddit.reddit_feed(subreddit, int(request.args.get('votes', 0)))
+    return Response(content, mimetype='application/rss+xml')
+
+
+@app.route("/hackernews.xml")
+def hackernews_feed():
+    content = hackernews.hackernews_feed(int(request.args.get('votes', 0)))
+    return Response(content, mimetype='application/rss+xml')
+
+
+@app.route("/product_hunt.xml")
+def product_hunt_feed():
+    content = product_hunt.product_hunt_feed(int(request.args.get('votes', 0)))
+    return Response(content, mimetype='application/rss+xml')
 
 
 @app.route("/logout")
@@ -149,7 +160,8 @@ def logout():
             del session[k]
     return redirect("/")
 
-app.secret_key = 'yZ7BMXMOXj7YA3cR2yS0WrNPll8tilaEBiiRjreRKJB389orNqqwGE='
+
+app.secret_key = SECRET_KEY
 
 if __name__ == "__main__":
     app.run(debug=True, port=8080, host='0.0.0.0')

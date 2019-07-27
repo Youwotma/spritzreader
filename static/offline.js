@@ -116,6 +116,8 @@ function getTodos(){
 }
 
 function prune(){
+  server.then((s) => s.images.remove(IDBKeyRange.upperBound('http://m'))).then(console.log('done'))
+  server.then((s) => s.images.remove(IDBKeyRange.lowerBound('http://x'))).then(console.log('done'))
 }
 
 function removeTodo(idOrType, article) {
