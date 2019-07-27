@@ -5,6 +5,7 @@ from proxy import proxy
 import reddit
 import hackernews
 import product_hunt
+import proxy_feed
 
 import time
 import hashlib
@@ -133,6 +134,12 @@ def auth():
 def _proxy():
     [content, mime] = proxy(request.args['url'])
     return Response(content, mimetype=mime)
+
+
+@app.route("/proxy_feed")
+def _proxy_feed():
+    content = proxy_feed.proxy_feed(request.args['url'])
+    return Response(content, mimetype='application/rss+xml')
 
 
 @app.route("/r/<subreddit>.xml")
