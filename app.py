@@ -72,7 +72,7 @@ def feeds():
 
 
 def hasharticle(article):
-    hex = hashlib.sha1(article['id']).hexdigest()[:12]
+    hex = hashlib.sha1(article['id'].encode('utf-8')).hexdigest()[:12]
     return binascii.b2a_base64(binascii.unhexlify(hex)).strip()
 
 
