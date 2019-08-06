@@ -68,8 +68,8 @@ def extract_imgur(url):
 def extract_oembed(url):
     try:
         data = oEmbed(url)
-        if data.get('thumbnail_url'):
-            keys = 'title', 'author_name', 'type', 'provider'
+        if data.get('thumbnail_url') and data.get('type') not in ('link', 'rich'):
+            keys = 'title', 'author_name', 'type', 'provider_name'
             description = ", ".join("%s: %r" % (key, data.get(key, '[not set]')) for key in keys)
 
             return E.div(
