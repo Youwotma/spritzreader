@@ -2,6 +2,7 @@
 import requests
 import json
 import urllib
+import urllib.parse
 
 class FeedlyClient(object):
     def __init__(self, **options):
@@ -98,7 +99,7 @@ class FeedlyClient(object):
             params = dict(entryIds=[entryId])
             res = requests.put(url=request_url, data=json.dumps(params), headers=headers)
         else:
-            request_url += '/' + urllib.quote_plus(entryId)
+            request_url += '/' + urllib.parse.quote_plus(entryId)
             res = requests.delete(url=request_url, headers=headers)
         return res
 
