@@ -10,6 +10,7 @@ import proxy_feed
 import time
 import hashlib
 import binascii
+import os
 
 app = Flask(__name__)
 
@@ -171,4 +172,4 @@ def logout():
 app.secret_key = SECRET_KEY
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8080, host='0.0.0.0')
+    app.run(debug=True, port=int(os.environ.get('PORT', 8080)), host='0.0.0.0')

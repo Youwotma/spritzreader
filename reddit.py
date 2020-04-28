@@ -33,7 +33,11 @@ def render_comment(comment):
     content = comment['content']
     link = E.span(E.a(comment['author'], href=comment['author_url']), ': ')
     parent = content.find('./div[1]/*')
-    parent = parent if parent.tag.lower() == 'p' else content.find('./div[1]') or content
+    if parent.tag.lower() != 'p':
+        parent = content.find('./div[1]')
+        if parent is None:
+            parent = content
+
     link.tail = parent.text
     parent.text = ''
     parent.insert(0, link)
@@ -80,6 +84,7 @@ def reddit_feed(reddit, threshold):
         })
 
     return render_feed('Reddit feed for %s' % reddit, 'https://reddit.com/r/%s' % reddit, posts)
+
 
 if __name__ == '__main__':
     print(reddit_feed('programming', 0))

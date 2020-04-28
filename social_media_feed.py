@@ -9,11 +9,22 @@ from cache import cache
 from lxml import etree
 from lxml.builder import E
 from lxml.html import fragment_fromstring
-from urllib.parse import quote_plus
 from readability import Document
 from pyoembed import oEmbed, PyOembedException
 
 KB = 1024
+
+
+def timeit(method):
+    import time
+
+    def timed(*args, **kw):
+        ts = time.time()
+        result = method(*args, **kw)
+        te = time.time()
+        print('%r %r  %2.2f ms' % (method.__name__, args, (te - ts) * 1000))
+        return result
+    return timed
 
 
 def element_to_string(e):
@@ -43,21 +54,22 @@ def process_html(html_str, base_url):
 
 
 def img(orig_url):
-    template = "https://%s/v7/%s?w=500&h=1000&func=bound&org_if_sml=1"
-    url = template % (CLOUDIMAGE_HOST, quote_plus(orig_url))
+    template = "https://%s/v7/%s%sw=500&h=1000&func=bound&org_if_sml=1"
+    separator = "&" if "?" in orig_url else "?"
+    url = template % (CLOUDIMAGE_HOST, orig_url, separator)
     return E.img(src=url)
 
 
 def extract_imgur(url):
-    m = re.match('https?://(i\.imgur\.com|i\.reddituploads\.com|imgur\.com)/', url)
+    m = re.match(r'https?://(i\.imgur\.com|i\.redd\.it|i\.reddituploads\.com|imgur\.com)/', url)
 
     if m is None:
         return None
 
     if m.group(1) == 'imgur.com':
-        if re.match("https?://imgur\.com/a/", url):
+        if re.match(r"https?://imgur\.com/a/", url):
             return E.a('Imgur Album', href=url)
-        m = re.match("https?://imgur\.com/([^\/]+)$", url)
+        m = re.match(r"https?://imgur\.com/([^\/]+)$", url)
         if m:
             return img("https://i.imgur.com/%s" % m.group(1))
 
@@ -66,6 +78,7 @@ def extract_imgur(url):
         return img(url)
 
 
+# @timeit
 def extract_oembed(url):
     try:
         data = oEmbed(url)
@@ -77,17 +90,14 @@ def extract_oembed(url):
                     img(data["thumbnail_url"]),
                     E.p(description)
                    )
-    except PyOembedException as e:
+    except PyOembedException:
         return None
 
 
+# @timeit
 def _extract_main_content(url):
     if not re.match('^https?://', url):
         return E.p('Unsupported schema in url %r' % url)
-
-    oembed = extract_oembed(url)
-    if oembed is not None:
-        return oembed
 
     imgur = extract_imgur(url)
     if imgur is not None:
@@ -105,7 +115,12 @@ def _extract_main_content(url):
             )
         if mime == "text/plain" and len(res.text) < 100 * KB:
             return E.div(res.text)
-        if re.match('^(text/html|application/(xhtml\+)?xml)', mime) is not None and len(res.text) < 200 * KB:
+        if re.match(r'^(text/html|application/(xhtml\+)?xml)', mime) is not None and len(res.text) < 200 * KB:
+
+            oembed = extract_oembed(url)
+            if oembed is not None:
+                return oembed
+
             doc = Document(res.text, url=url)
             return E.div(
                      E.h1(doc.title()),

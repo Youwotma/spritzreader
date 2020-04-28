@@ -1,7 +1,6 @@
 import requests
 
 from config import CLOUDIMAGE_HOST
-from urllib.parse import quote_plus
 
 s = requests.Session()
 
@@ -16,8 +15,9 @@ def proxy(url):
     if url.startswith('https://%s' % CLOUDIMAGE_HOST) or not is_image(url):
         res = s.get(url)
     else:
-        template = "https://%s/v7/%s?w=500&h=1000&func=bound&org_if_sml=1"
-        url = template % (CLOUDIMAGE_HOST, quote_plus(url))
+        template = "https://%s/v7/%s%sw=500&h=1000&func=bound&org_if_sml=1"
+        separator = "&" if "?" in url else "?"
+        url = template % (CLOUDIMAGE_HOST, url, separator)
         res = s.get(url)
     mime = res.headers.get('content-type', 'application/octet-stream')
     return [res.content, mime]
