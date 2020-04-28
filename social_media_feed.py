@@ -2,7 +2,7 @@ import requests
 import re
 import hashlib
 
-from config import HOST
+from config import CLOUDIMAGE_HOST
 from requests_session import session
 from cache import cache
 
@@ -43,7 +43,8 @@ def process_html(html_str, base_url):
 
 
 def img(orig_url):
-    url = "https://%s/proxy?url=%s" % (HOST, quote_plus(orig_url))
+    template = "https://%s/v7/%s?w=500&h=1000&func=bound&org_if_sml=1"
+    url = template % (CLOUDIMAGE_HOST, quote_plus(orig_url))
     return E.img(src=url)
 
 

@@ -1,33 +1,23 @@
 import requests
-import io
-from PIL import Image
+
+from config import CLOUDIMAGE_HOST
+from urllib.parse import quote_plus
 
 s = requests.Session()
 
 
-def proxy(url):
-    res = s.get(url, stream=False)
+def is_image(url):
+    res = s.head(url, stream=False)
     mime = res.headers.get('content-type', 'application/octet-stream')
-    content = res.content
+    return mime.lower().startswith('image/')
 
-    if mime.lower().startswith('image/'):
-        orig = io.BytesIO(content)
-        i = Image.open(orig)
-        i = i.convert('RGB')
-        i.thumbnail([500, 1000])
 
-        png = io.BytesIO()
-        i.save(png, 'PNG')
-        png = png.getvalue()
-        if len(content) > len(png):
-            content = png
-            mime = 'image/png'
-
-        jpeg = io.BytesIO()
-        i.save(jpeg, 'JPEG', optimize=True, quality=65)
-        jpeg = jpeg.getvalue()
-        if len(content) > len(jpeg):
-            content = jpeg
-            mime = 'image/jpeg'
-
-    return [content, mime]
+def proxy(url):
+    if url.startswith('https://%s' % CLOUDIMAGE_HOST) or not is_image(url):
+        res = s.get(url)
+    else:
+        template = "https://%s/v7/%s?w=500&h=1000&func=bound&org_if_sml=1"
+        url = template % (CLOUDIMAGE_HOST, quote_plus(url))
+        res = s.get(url)
+    mime = res.headers.get('content-type', 'application/octet-stream')
+    return [res.content, mime]
